@@ -1,0 +1,348 @@
+// codeunit 50101 "CDS Mapping Addition"
+// {
+//     EventSubscriberInstance = StaticAutomatic;
+
+//     [EventSubscriber(ObjectType::Codeunit, Codeunit::"CDS Setup Defaults", 'OnAfterResetCustomerAccountMapping', '', true, true)]
+//     local procedure HandleOnAfterResetContactContactMapping(IntegrationTableMappingName: Code[20])
+//     var
+//         ParentItem: Record "Parent Items";
+//         CDSParentItem: Record "CRM Parent Items";
+//         OEM: Record OEM;
+//         CDSOEM: Record "CRM OEM";
+//         Item: Record Item;
+//         CDSItem: Record "CRM Product";
+//         Countries: Record "Country/Region";
+//         CDSCountry: Record "CRM Country";
+//         Customer: Record Customer;
+//         CDSCust: Record "CRM Account";
+//         Contact: Record Contact;
+//         CDSContact: Record "CRM Contact";
+//         ItemVendor: Record "Item Vendor";
+//         CDSProductVendor: Record "CRM Product Vendor";
+//         IntegrationFieldMapping: Record "Integration Field Mapping";
+//         IntegrationTableMapping: Record "Integration Table Mapping";
+//     begin
+//         //Vendor Catalogue +
+//         /*   
+//             IntegrationTableMappingName := 'Vendor Catalogue';
+
+//             InsertIntegrationTableMapping(
+//                IntegrationTableMapping, IntegrationTableMappingName,
+//                DATABASE::"Item Vendor", DATABASE::"CRM Product Vendor",
+//                CDSItem.FieldNo(ProductId), CDSItem.FieldNo(ModifiedOn),
+//                '', '', false);
+
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Item No."), CDSProductVendor.FieldNo("Product Vendor"),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Vendor No."), CDSProductVendor.FieldNo("Vendor No."),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Lead Time Calculation"), CDSProductVendor.FieldNo("Lead Time"),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Vendor Item No."), CDSProductVendor.FieldNo("Vendor Item No."),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Unit Cost"), CDSProductVendor.FieldNo("Unit Cost"),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Unit Cost Checked on"), CDSProductVendor.FieldNo("Unit Cost Checked on"),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Quantity Available"), CDSProductVendor.FieldNo("Quantity Available"),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Quantity Checked on"), CDSProductVendor.FieldNo("Quantity Checked On"),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Expiry Date"), CDSProductVendor.FieldNo("Expiry Date"),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Vendor Name"), CDSProductVendor.FieldNo("Vendor Name"),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            ItemVendor.FieldNo("Vendor Name 2"), CDSProductVendor.FieldNo("Vendor Name 2"),
+//            IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            // InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            // ItemVendor.FieldNo(), CDSProductVendor.FieldNo(),
+//            // IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            // InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            // ItemVendor.FieldNo(), CDSProductVendor.FieldNo(),
+//            // IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+
+//            // InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//            // .FieldNo(), .FieldNo(),
+//            // IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//            */
+//         //Vendor Catalogue - 
+
+//         //Contact +
+//         // IntegrationTableMappingName := 'Contact';
+
+//         // InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         // Customer.FieldNo(), CDSCust.FieldNo(),
+//         // IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         //Contact -
+
+//         //Item +
+//         IntegrationTableMappingName := 'Item - Product';
+
+//         InsertIntegrationTableMapping(
+//                     IntegrationTableMapping, IntegrationTableMappingName,
+//                     DATABASE::Item, DATABASE::"CRM Product",
+//                     // Item.FieldNo("No."), CDSItem.FieldNo(ProductId),
+//                     CDSItem.FieldNo(ProductId), CDSItem.FieldNo(ModifiedOn),
+//                     '', '', false);
+
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("No."), CDSItem.FieldNo(ProductId),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo(Description), CDSItem.FieldNo(Name),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         // InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         // Item.FieldNo("Unit Price"), CDSItem.FieldNo(p),
+//         // IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Unit Cost"), CDSItem.FieldNo(StandardCost),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Unit Cost"), CDSItem.FieldNo(StandardCost),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Unit Volume"), CDSItem.FieldNo(StockVolume),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Gross Weight"), CDSItem.FieldNo(StockWeight),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Vendor No."), CDSItem.FieldNo(VendorID),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Vendor Item No."), CDSItem.FieldNo(VendorName),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo(Inventory), CDSItem.FieldNo(QuantityOnHand),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo(Condition), CDSItem.FieldNo(Condition),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Parent Item"), CDSItem.FieldNo("Parent Item"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Market Average"), CDSItem.FieldNo("Market Average"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Competitor Average"), CDSItem.FieldNo("Competitor Average"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Item.FieldNo("Recommended Price"), CDSItem.FieldNo("Recommended Price"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         // InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         // Item.FieldNo("Country/Region of Origin Code"), CDSItem.FieldNo(),
+//         // IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         //Item -
+
+//         //Country +
+//         IntegrationTableMappingName := 'Country';
+
+//         InsertIntegrationTableMapping(
+//                     IntegrationTableMapping, IntegrationTableMappingName,
+//                     DATABASE::"Country/Region", DATABASE::"CRM Country",
+//                     // Item.FieldNo("No."), CDSItem.FieldNo(ProductId),
+//                     Countries.FieldNo(SystemId), CDSCountry.FieldNo(SystemId),
+//                     '', '', false);
+
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Countries.FieldNo(Code), CDSCountry.FieldNo(Code),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Countries.FieldNo(Name), CDSCountry.FieldNo(Name),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Countries.FieldNo("ISO Code"), CDSCountry.FieldNo("ISO Code"),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Countries.FieldNo("ISO Numeric Code"), CDSCountry.FieldNo("ISO Numeric Code"),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Countries.FieldNo("EU Country/Region Code"), CDSCountry.FieldNo("EU Country/Region Code"),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Countries.FieldNo("Intrastat Code"), CDSCountry.FieldNo("Intrastat Code"),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Countries.FieldNo("VAT Scheme"), CDSCountry.FieldNo("VAT Scheme"),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Countries.FieldNo("Last Modified Date Time"), CDSCountry.FieldNo("Last Modified Date Time"),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         //Country -
+
+//         //OEM +
+//         IntegrationTableMappingName := 'OEM';
+
+//         InsertIntegrationTableMapping(
+//             IntegrationTableMapping, IntegrationTableMappingName,
+//                     DATABASE::OEM, DATABASE::"CRM OEM",
+//                     OEM.FieldNo(Name), CDSOEM.FieldNo(SystemId),
+//                     '', '', false);
+
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         OEM.FieldNo(Code), CDSOEM.FieldNo(Code),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         OEM.FieldNo(Name), CDSOEM.FieldNo(Name),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         //OEM -
+
+//         //Parent Item +
+//         IntegrationTableMappingName := 'Parent Items';
+
+//         InsertIntegrationTableMapping(
+//                     IntegrationTableMapping, IntegrationTableMappingName,
+//                     DATABASE::"Parent Items", DATABASE::"CRM Parent Items",
+//                     // ParentItem.FieldNo("No."), CDSParentItem.FieldNo("No."),
+//                     ParentItem.FieldNo("Parent Item"), CDSParentItem.FieldNo("Parent Item"),
+//                     '', '', false);
+
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("No."), CDSParentItem.FieldNo("No."),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo(Description), CDSParentItem.FieldNo(Description),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Description 2"), CDSParentItem.FieldNo("Description 2"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Search Description"), CDSParentItem.FieldNo("Search Description"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Automatic Ext. Texts"), CDSParentItem.FieldNo("Automatic Ext. Texts"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Basic Unit of Meassure"), CDSParentItem.FieldNo("Basic Unit of Meassure"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo(OEM), CDSParentItem.FieldNo(OEM),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo(EAN), CDSParentItem.FieldNo(EAN),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo(GTIN), CDSParentItem.FieldNo(GTIN),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Net Weight"), CDSParentItem.FieldNo("Net Weight"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Gross Weight"), CDSParentItem.FieldNo("Gross Weight"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Unit Volume"), CDSParentItem.FieldNo("Unit Volume"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Tariff No."), CDSParentItem.FieldNo("Tariff No."),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Import Tariff Code"), CDSParentItem.FieldNo("Import Tariff Code"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Export Tariff Code"), CDSParentItem.FieldNo("Export Tariff Code"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Available New"), CDSParentItem.FieldNo("Available New"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Available Refurbished"), CDSParentItem.FieldNo("Available Refurbished"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         ParentItem.FieldNo("Available Used"), CDSParentItem.FieldNo("Available Used"),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         //Parent Item -
+
+//         //Customer +
+//         /*
+//         IntegrationTableMappingName := 'Customer';
+
+//         InsertIntegrationTableMapping(
+//                     IntegrationTableMapping, IntegrationTableMappingName,
+//                     DATABASE::Customer, DATABASE::"CRM Account",
+//                     CDSCust.FieldNo(AccountId), CDSCust.FieldNo(AccountId),
+//                     '', '', false);
+
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo(Name), CDSCust.FieldNo(Name),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo(Contact), CDSCust.FieldNo(Address2_PrimaryContactName),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo(Address), CDSCust.FieldNo(Address1_Line1),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("Address 2"), CDSCust.FieldNo(Address1_Line2),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("Post Code"), CDSCust.FieldNo(Address1_PostalCode),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo(City), CDSCust.FieldNo(Address1_City),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("Country/Region Code"), CDSCust.FieldNo(Address1_Country),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo(County), CDSCust.FieldNo(Address1_County),
+//         IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         // InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         // Customer.FieldNo("Currency Code"), CDSCust.FieldNo(),
+//         // IntegrationFieldMapping.Direction::ToIntegrationTable, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("E-Mail"), CDSCust.FieldNo(EMailAddress1),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("Fax No."), CDSCust.FieldNo(Fax),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("Home Page"), CDSCust.FieldNo(WebSiteURL),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         // InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         // Customer.FieldNo("Phone No."), CDSCust.FieldNo(main),
+//         // IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("Shipment Method Code"), CDSCust.FieldNo(Address1_FreightTermsCodeEnum),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("Shipping Agent Code"), CDSCust.FieldNo(Address1_ShippingMethodCodeEnum),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("Payment Terms Code"), CDSCust.FieldNo(PaymentTermsCodeEnum),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         Customer.FieldNo("Credit Limit (LCY)"), CDSCust.FieldNo(CreditLimit),
+//         IntegrationFieldMapping.Direction::Bidirectional, '', true, false);*/
+//         // InsertIntegrationFieldMapping(IntegrationTableMappingName,
+//         // Customer.FieldNo("Primary Contact No."), CDSCust.FieldNo(Address1_PrimaryContactName),
+//         // IntegrationFieldMapping.Direction::Bidirectional, '', true, false);
+//         //Customer -
+//     end;
+
+//     local procedure InsertIntegrationTableMapping(var IntegrationTableMapping: Record "Integration Table Mapping"; MappingName: Code[20]; TableNo: Integer; IntegrationTableNo: Integer; IntegrationTableUIDFieldNo: Integer; IntegrationTableModifiedFieldNo: Integer; TableConfigTemplateCode: Code[10]; IntegrationTableConfigTemplateCode: Code[10]; SynchOnlyCoupledRecords: Boolean)
+//     begin
+//         IntegrationTableMapping.CreateRecord(MappingName, TableNo, IntegrationTableNo, IntegrationTableUIDFieldNo, IntegrationTableModifiedFieldNo, TableConfigTemplateCode, IntegrationTableConfigTemplateCode, SynchOnlyCoupledRecords, IntegrationTableMapping.Direction::ToIntegrationTable, 'CDS');
+//     end;
+
+//     procedure InsertIntegrationFieldMapping(IntegrationTableMappingName: Code[20]; TableFieldNo: Integer; IntegrationTableFieldNo: Integer; SynchDirection: Option; ConstValue: Text; ValidateField: Boolean; ValidateIntegrationTableField: Boolean)
+//     var
+//         IntegrationFieldMapping: Record "Integration Field Mapping";
+//     begin
+//         IntegrationFieldMapping.CreateRecord(IntegrationTableMappingName, TableFieldNo, IntegrationTableFieldNo, SynchDirection,
+//             ConstValue, ValidateField, ValidateIntegrationTableField);
+//     end;
+// }
